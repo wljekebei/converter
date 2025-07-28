@@ -14,6 +14,7 @@
         <maven.compiler.source>24</maven.compiler.source>
         <maven.compiler.target>24</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
     </properties>
 
     <dependencies>
@@ -42,7 +43,7 @@
                 <version>0.0.8</version>
                 <configuration>
                     <!-- Замени на полный путь к твоему классу с main, который extends Application -->
-                    <mainClass>org.example.App</mainClass>
+                    <mainClass>C:\Users\rosti\IdeaProjects\ExchangeRate\src\main\java\App.java</mainClass>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -8,8 +9,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -20,6 +21,10 @@ public class App extends Application {
         TextField amountField = new TextField();
         Label label = new Label("Enter amount and choose currencies");
         Label result = new Label("result");
+        Label exception = new Label("");
+        label.setFont(new Font("System", 20));
+        result.setFont(new Font("System", 22));
+        exception.setFont(new Font("System", 20));
 
         ComboBox<String> fromCurrency = new ComboBox<>();
         ComboBox<String> toCurrency = new ComboBox<>();
@@ -30,26 +35,45 @@ public class App extends Application {
             toCurrency.getItems().addAll(s);
         }
 
+        moveFirst(fromCurrency.getItems(), "UAH");
+        moveFirst(fromCurrency.getItems(), "HUF");
+        moveFirst(fromCurrency.getItems(), "EUR");
+        moveFirst(toCurrency.getItems(), "UAH");
+        moveFirst(toCurrency.getItems(), "HUF");
+        moveFirst(toCurrency.getItems(), "EUR");
+
         Button button = new Button("Convert!");
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Response currentRates;
+                double res = 0;
                 try {
                     currentRates = Rates.getRates(fromCurrency.getValue());
+                    res = Conversion.convert(currentRates, toCurrency.getValue(), Double.parseDouble(amountField.getText()));
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    exception.setText("Input/Output Exception");
                 } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
+                    exception.setText("API error, try again");
+                } catch (NumberFormatException ex) {
+                    exception.setText("Enter the correct number");
+                } catch (NullPointerException ex) {
+                    exception.setText("Choose currencies");
                 }
-                double res = Conversion.convert(currentRates, toCurrency.getValue(), Double.parseDouble(amountField.getText()));
-                result.setText(String.format("%.2f", res));
+                result.setText(String.format("%.2f %s = %.2f %s", Double.parseDouble(amountField.getText()), fromCurrency.getValue(), res, toCurrency.getValue()));
             }
         });
 
-        HBox amountBox = new HBox(new Label("Amount:"), amountField);
-        HBox fromBox = new HBox(new Label("From:"), fromCurrency);
-        HBox toBox = new HBox(new Label("To:"), toCurrency);
-        VBox root = new VBox(label, amountBox, fromBox, toBox, button, result);
+        Label amount = new Label("Amount:");
+        Label from = new Label("From:");
+        Label to = new Label("To:");
+        amount.setFont(new Font("System", 20));
+        from.setFont(new Font("System", 20));
+        to.setFont(new Font("System", 20));
+
+        HBox amountBox = new HBox(amount, amountField);
+        HBox fromBox = new HBox(from, fromCurrency);
+        HBox toBox = new HBox(to, toCurrency);
+        VBox root = new VBox(label, amountBox, fromBox, toBox, button, result, exception);
 
         amountBox.setSpacing(20);
         fromBox.setSpacing(20);
@@ -64,5 +88,14 @@ public class App extends Application {
         primaryStage.setTitle("Currency converter");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch();
+    }
+
+    public static void moveFirst(ObservableList<String> list, String s) {
+        list.remove(s);
+        list.addFirst(s);
     }
 }

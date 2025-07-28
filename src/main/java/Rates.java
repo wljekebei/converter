@@ -21,8 +21,7 @@ public class Rates {
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = gsonBuilder.create();
-        Response resObject = gson.fromJson(body, Response.class);
 
-        return resObject;
+        return gson.fromJson(body, Response.class);
     }
 }

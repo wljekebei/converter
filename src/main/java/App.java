@@ -35,14 +35,12 @@ public class App extends Application {
             toCurrency.getItems().addAll(s);
         }
 
-        moveFirst(fromCurrency.getItems(), "UAH");
-        moveFirst(fromCurrency.getItems(), "HUF");
-        moveFirst(fromCurrency.getItems(), "EUR");
-        moveFirst(toCurrency.getItems(), "UAH");
-        moveFirst(toCurrency.getItems(), "HUF");
-        moveFirst(toCurrency.getItems(), "EUR");
+        String [] firstCurrencies = {"UAH", "HUF", "EUR", "USD"};
+        moveFirst(fromCurrency.getItems(), firstCurrencies);
+        moveFirst(toCurrency.getItems(), firstCurrencies);
 
         Button button = new Button("Convert!");
+        button.setDefaultButton(true);
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 Response currentRates;
@@ -60,6 +58,8 @@ public class App extends Application {
                     exception.setText("Choose currencies");
                 }
                 result.setText(String.format("%.2f %s = %.2f %s", Double.parseDouble(amountField.getText()), fromCurrency.getValue(), res, toCurrency.getValue()));
+                if ((String.valueOf((int)res)).length() >= 5) result.setFont(new Font("System", 22 - (2.5 * ((String.valueOf((int)res)).length() / 5))));
+                else result.setFont(new Font("System", 22));
             }
         });
 
@@ -94,8 +94,10 @@ public class App extends Application {
         launch();
     }
 
-    public static void moveFirst(ObservableList<String> list, String s) {
-        list.remove(s);
-        list.addFirst(s);
+    public static void moveFirst(ObservableList<String> list, String [] strings) {
+        for (String s : strings) {
+            list.remove(s);
+            list.addFirst(s);
+        }
     }
 }

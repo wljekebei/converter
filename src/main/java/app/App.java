@@ -1,3 +1,7 @@
+package app;
+import service.*;
+import model.*;
+
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -28,7 +32,7 @@ public class App extends Application {
 
         ComboBox<String> fromCurrency = new ComboBox<>();
         ComboBox<String> toCurrency = new ComboBox<>();
-        Response rates = Rates.getRates("USD");
+        ExchangeRateResponse rates = ExchangeRateService.fetchRates("USD");
 
         for (String s : rates.conversion_rates.keySet()) {
             fromCurrency.getItems().add(s);
@@ -43,19 +47,23 @@ public class App extends Application {
         button.setDefaultButton(true);
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                Response currentRates;
+                ExchangeRateResponse currentRates;
                 double res = 0;
                 try {
-                    currentRates = Rates.getRates(fromCurrency.getValue());
+                    currentRates = ExchangeRateService.fetchRates(fromCurrency.getValue());
                     res = Conversion.convert(currentRates, toCurrency.getValue(), Double.parseDouble(amountField.getText()));
                 } catch (IOException ex) {
                     exception.setText("Input/Output Exception");
+                    ex.printStackTrace();
                 } catch (InterruptedException ex) {
                     exception.setText("API error, try again");
+                    ex.printStackTrace();
                 } catch (NumberFormatException ex) {
                     exception.setText("Enter the correct number");
+                    ex.printStackTrace();
                 } catch (NullPointerException ex) {
                     exception.setText("Choose currencies");
+                    ex.printStackTrace();
                 }
                 result.setText(String.format("%.2f %s = %.2f %s", Double.parseDouble(amountField.getText()), fromCurrency.getValue(), res, toCurrency.getValue()));
                 if ((String.valueOf((int)res)).length() >= 5) result.setFont(new Font("System", 22 - (2.5 * ((String.valueOf((int)res)).length() / 5))));

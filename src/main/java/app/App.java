@@ -23,15 +23,19 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException, InterruptedException {
         TextField amountField = new TextField();
-        Label label = new Label("Enter amount and choose currencies");
+        amountField.setPrefWidth(150);
+        amountField.setFont(new Font("System", 18));
         Label result = new Label("result");
         Label exception = new Label("");
-        label.setFont(new Font("System", 20));
         result.setFont(new Font("System", 22));
         exception.setFont(new Font("System", 20));
 
         ComboBox<String> fromCurrency = new ComboBox<>();
+        fromCurrency.setPrefSize(115, 25);
+        fromCurrency.setStyle("-fx-font-size: 18px;");
         ComboBox<String> toCurrency = new ComboBox<>();
+        toCurrency.setPrefSize(115, 25);
+        toCurrency.setStyle("-fx-font-size: 18px;");
         ExchangeRateResponse rates = ExchangeRateService.fetchRates("USD");
 
         for (String s : rates.conversion_rates.keySet()) {
@@ -45,6 +49,8 @@ public class App extends Application {
 
         Button button = new Button("Convert!");
         button.setDefaultButton(true);
+        button.setPrefSize(135, 20);
+        button.setFont(new Font("System", 20));
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 ExchangeRateResponse currentRates;
@@ -52,6 +58,7 @@ public class App extends Application {
                 try {
                     currentRates = ExchangeRateService.fetchRates(fromCurrency.getValue());
                     res = Conversion.convert(currentRates, toCurrency.getValue(), Double.parseDouble(amountField.getText()));
+                    exception.setText("");
                 } catch (IOException ex) {
                     exception.setText("Input/Output Exception");
                     ex.printStackTrace();
@@ -66,7 +73,7 @@ public class App extends Application {
                     ex.printStackTrace();
                 }
                 result.setText(String.format("%.2f %s = %.2f %s", Double.parseDouble(amountField.getText()), fromCurrency.getValue(), res, toCurrency.getValue()));
-                if ((String.valueOf((int)res)).length() >= 5) result.setFont(new Font("System", 22 - (2.5 * ((String.valueOf((int)res)).length() / 5))));
+                if ((String.valueOf((int)res)).length() > 5) result.setFont(new Font("System", 22 - (2.2 * ((String.valueOf((int)res)).length() / 5))));
                 else result.setFont(new Font("System", 22));
             }
         });
@@ -81,7 +88,7 @@ public class App extends Application {
         HBox amountBox = new HBox(amount, amountField);
         HBox fromBox = new HBox(from, fromCurrency);
         HBox toBox = new HBox(to, toCurrency);
-        VBox root = new VBox(label, amountBox, fromBox, toBox, button, result, exception);
+        VBox root = new VBox(amountBox, fromBox, toBox, button, result, exception);
 
         amountBox.setSpacing(20);
         fromBox.setSpacing(20);
